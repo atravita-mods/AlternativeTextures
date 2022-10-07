@@ -28,15 +28,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using xTile.Tiles;
 using Microsoft.Xna.Framework.Input;
 using StardewValley.GameData;
 using Newtonsoft.Json;
-using StardewValley.Buildings;
 using StardewValley.Monsters;
+using AlternativeTextures.Framework.Utilities.Extensions;
+
+using Object = StardewValley.Object;
 
 namespace AlternativeTextures
 {
@@ -316,7 +315,9 @@ namespace AlternativeTextures
                 else if (terrainFeature is HoeDirt hoeDirt && hoeDirt.crop is not null)
                 {
                     var modelType = AlternativeTextureModel.TextureType.Crop;
-                    var instanceName = Game1.objectInformation.ContainsKey(hoeDirt.crop.netSeedIndex.Value) ? Game1.objectInformation[hoeDirt.crop.netSeedIndex.Value].Split('/')[0] : String.Empty;
+                    var instanceName = Game1.objectInformation.TryGetValue(hoeDirt.crop.netSeedIndex.Value, out var data)
+                        ? data.GetNthChunk('/', Object.objectInfoNameIndex).ToString()
+                        : string.Empty;
                     if (!hoeDirt.modData.ContainsKey("AlternativeTextureName") || !hoeDirt.modData.ContainsKey("AlternativeTextureVariation"))
                     {
                         // Assign default modData
@@ -427,7 +428,9 @@ namespace AlternativeTextures
                     else if (terrainFeature is HoeDirt hoeDirt && hoeDirt.crop is not null)
                     {
                         var modelType = AlternativeTextureModel.TextureType.Crop;
-                        var instanceName = Game1.objectInformation.ContainsKey(hoeDirt.crop.netSeedIndex.Value) ? Game1.objectInformation[hoeDirt.crop.netSeedIndex.Value].Split('/')[0] : String.Empty;
+                        var instanceName = Game1.objectInformation.TryGetValue(hoeDirt.crop.netSeedIndex.Value, out var data)
+                            ? data.GetNthChunk('/', Object.objectInfoNameIndex).ToString()
+                            : string.Empty;
                         if (tool.modData[PAINT_BRUSH_FLAG] == $"{modelType}_{instanceName}")
                         {
                             hoeDirt.modData["AlternativeTextureOwner"] = tool.modData["AlternativeTextureOwner"];
@@ -517,7 +520,7 @@ namespace AlternativeTextures
                 else if (terrainFeature is HoeDirt hoeDirt && hoeDirt.crop is not null)
                 {
                     var modelType = AlternativeTextureModel.TextureType.Crop;
-                    var instanceName = Game1.objectInformation.ContainsKey(hoeDirt.crop.netSeedIndex.Value) ? Game1.objectInformation[hoeDirt.crop.netSeedIndex.Value].Split('/')[0] : String.Empty;
+                    var instanceName = hoeDirt.crop.netSeedIndex.Value.GetObjectNameFromID();
                     if (!hoeDirt.modData.ContainsKey("AlternativeTextureName") || !hoeDirt.modData.ContainsKey("AlternativeTextureVariation"))
                     {
                         // Assign default modData
@@ -555,8 +558,8 @@ namespace AlternativeTextures
                 {
                     var modelType = AlternativeTextureModel.TextureType.FruitTree;
                     Dictionary<int, string> data = Game1.content.Load<Dictionary<int, string>>("Data\\fruitTrees");
-                    var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.Split('/')[0]) == fruitTree.treeType).Key;
-                    var saplingName = Game1.objectInformation.ContainsKey(saplingIndex) ? Game1.objectInformation[saplingIndex].Split('/')[0] : String.Empty;
+                    var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.GetNthChunk('/', 0)) == fruitTree.treeType.Value).Key;
+                    var saplingName = Game1.objectInformation.TryGetValue(saplingIndex, out var str) ? str.GetNthChunk('/', Object.objectInfoNameIndex).ToString() : String.Empty;
                     if (!fruitTree.modData.ContainsKey("AlternativeTextureName") || !fruitTree.modData.ContainsKey("AlternativeTextureVariation"))
                     {
                         // Assign default modData
@@ -666,7 +669,7 @@ namespace AlternativeTextures
                         if (terrainFeature is HoeDirt hoeDirt && hoeDirt.crop is not null)
                         {
                             var modelType = AlternativeTextureModel.TextureType.Crop;
-                            var instanceName = Game1.objectInformation.ContainsKey(hoeDirt.crop.netSeedIndex.Value) ? Game1.objectInformation[hoeDirt.crop.netSeedIndex.Value].Split('/')[0] : String.Empty;
+                            var instanceName = hoeDirt.crop.netSeedIndex.Value.GetObjectNameFromID();
                             if (tool.modData[SPRAY_CAN_FLAG] == $"{modelType}_{instanceName}")
                             {
                                 hoeDirt.modData["AlternativeTextureOwner"] = actualSelectedModel.Owner;
@@ -705,8 +708,8 @@ namespace AlternativeTextures
                         {
                             var modelType = AlternativeTextureModel.TextureType.FruitTree;
                             Dictionary<int, string> data = Game1.content.Load<Dictionary<int, string>>("Data\\fruitTrees");
-                            var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.Split('/')[0]) == fruitTree.treeType).Key;
-                            var saplingName = Game1.objectInformation.ContainsKey(saplingIndex) ? Game1.objectInformation[saplingIndex].Split('/')[0] : String.Empty;
+                            var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.GetNthChunk('/', 0)) == fruitTree.treeType.Value).Key;
+                            var saplingName = saplingIndex.GetObjectNameFromID();
                             if (tool.modData[SPRAY_CAN_FLAG] == $"{modelType}_{saplingName}")
                             {
                                 fruitTree.modData["AlternativeTextureOwner"] = actualSelectedModel.Owner;
@@ -1402,22 +1405,20 @@ namespace AlternativeTextures
             {
                 if (obj.Type == "Craftable" || obj.Type == "Unknown")
                 {
-                    if (obj.bigCraftable && Game1.bigCraftablesInformation.TryGetValue(obj.parentSheetIndex, out var bigObjectInfo))
+                    if (obj.bigCraftable.Value && Game1.bigCraftablesInformation.TryGetValue(obj.ParentSheetIndex, out var bigObjectInfo))
                     {
-                        string[] objectInfoArray = bigObjectInfo.Split('/');
-                        string[] typeAndCategory = objectInfoArray[3].Split(' ');
-                        obj.type.Value = typeAndCategory[0];
+                        string[] typeAndCategory = bigObjectInfo.GetNthChunk('/', Object.objectInfoTypeIndex).ToString().Split(' ');
+                        obj.Type = typeAndCategory[0];
 
                         if (typeAndCategory.Length > 1)
                         {
                             obj.Category = Convert.ToInt32(typeAndCategory[1]);
                         }
                     }
-                    else if (!obj.bigCraftable && Game1.objectInformation.TryGetValue(obj.parentSheetIndex, out var objectInfo))
+                    else if (!obj.bigCraftable.Value && Game1.objectInformation.TryGetValue(obj.ParentSheetIndex, out var objectInfo))
                     {
-                        string[] objectInfoArray = objectInfo.Split('/');
-                        string[] typeAndCategory = objectInfoArray[3].Split(' ');
-                        obj.type.Value = typeAndCategory[0];
+                        string[] typeAndCategory = objectInfo.GetNthChunk('/', Object.objectInfoTypeIndex).ToString().Split(' ');
+                        obj.Type = typeAndCategory[0];
                         if (typeAndCategory.Length > 1)
                         {
                             obj.Category = Convert.ToInt32(typeAndCategory[1]);

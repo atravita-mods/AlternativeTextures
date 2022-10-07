@@ -1,6 +1,8 @@
 ﻿using AlternativeTextures;
 using AlternativeTextures.Framework.Models;
 using AlternativeTextures.Framework.UI;
+using AlternativeTextures.Framework.Utilities.Extensions;
+
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -240,7 +242,7 @@ namespace AlternativeTextures.Framework.Patches.Tools
                         var texturePath = PathUtilities.NormalizePath(Path.Combine(targetedBuilding.textureName() + ".png"));
                         try
                         {
-                            _ = _helper.Content.Load<Texture2D>(Path.Combine(targetedBuilding.textureName()), ContentSource.GameContent);
+                            _ = _helper.GameContent.Load<Texture2D>(Path.Combine(targetedBuilding.textureName()));
                             _monitor.Log($"{modelName} has a targetable texture within Buildings: {texturePath}", LogLevel.Trace);
                         }
                         catch (ContentLoadException ex)
@@ -252,7 +254,7 @@ namespace AlternativeTextures.Framework.Patches.Tools
                     // Display texture menu
                     var buildingObj = new Object(100, 1, isRecipe: false, -1)
                     {
-                        TileLocation = new Vector2(targetedBuilding.tileX, targetedBuilding.tileY),
+                        TileLocation = new Vector2(targetedBuilding.tileX.Value, targetedBuilding.tileY.Value),
                         modData = targetedBuilding.modData
                     };
                     Game1.activeClickableMenu = GetMenu(buildingObj, buildingObj.TileLocation * 64f, GetTextureType(targetedBuilding), modelName, _helper.Translation.Get("tools.name.paint_bucket"), textureTileWidth: targetedBuilding.tilesWide, isSprayCan: isSprayCan);
@@ -325,15 +327,15 @@ namespace AlternativeTextures.Framework.Patches.Tools
                     else if (targetedTerrain is FruitTree fruitTree)
                     {
                         Dictionary<int, string> data = Game1.content.Load<Dictionary<int, string>>("Data\\fruitTrees");
-                        var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.Split('/')[0]) == fruitTree.treeType).Key;
-                        var saplingName = Game1.objectInformation.ContainsKey(saplingIndex) ? Game1.objectInformation[saplingIndex].Split('/')[0] : String.Empty;
 
+                        var saplingIndex = data.FirstOrDefault(d => int.Parse(d.Value.GetNthChunk('/', 0)) == fruitTree.treeType.Value).Key;
+                        var saplingName = saplingIndex.GetObjectNameFromID();
                         var instanceSeasonName = $"{AlternativeTextureModel.TextureType.FruitTree}_{saplingName}_{Game1.GetSeasonForLocation(Game1.currentLocation)}";
                         AssignDefaultModData(targetedTerrain, instanceSeasonName, true);
                     }
                     else if (targetedTerrain is HoeDirt hoeDirt)
                     {
-                        var instanceName = Game1.objectInformation.ContainsKey(hoeDirt.crop.netSeedIndex.Value) ? Game1.objectInformation[hoeDirt.crop.netSeedIndex.Value].Split('/')[0] : String.Empty;
+                        var instanceName = hoeDirt.crop.netSeedIndex.Value.GetObjectNameFromID();
                         var instanceSeasonName = $"{AlternativeTextureModel.TextureType.Crop}_{instanceName}_{Game1.GetSeasonForLocation(Game1.currentLocation)}";
                         AssignDefaultModData(targetedTerrain, instanceSeasonName, true);
                     }

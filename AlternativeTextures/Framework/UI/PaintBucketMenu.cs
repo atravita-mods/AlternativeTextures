@@ -502,8 +502,8 @@ namespace AlternativeTextures.Framework.UI
                         var randomColor = new Color(Game1.random.Next(256), Game1.random.Next(256), Game1.random.Next(256));
                         AlternativeTextures.multiplayer.broadcastSprites(Game1.currentLocation, new TemporaryAnimatedSprite(6, _textureTarget.tileLocation.Value * 64f, randomColor, 8, flipped: false, 50f)
                         {
-                            motion = new Vector2((float)Game1.random.Next(-10, 11) / 10f, -Game1.random.Next(1, 3)),
-                            acceleration = new Vector2(0f, (float)Game1.random.Next(1, 3) / 100f),
+                            motion = new Vector2(Game1.random.Next(-10, 11) / 10f, -Game1.random.Next(1, 3)),
+                            acceleration = new Vector2(0f, Game1.random.Next(1, 3) / 100f),
                             accelerationChange = new Vector2(0f, -0.001f),
                             scale = 0.8f,
                             layerDepth = (_textureTarget.tileLocation.Y + 1f) * 64f / 10000f,
@@ -679,7 +679,7 @@ namespace AlternativeTextures.Framework.UI
                             var offset = textureModel.TextureHeight <= 16 ? 32 : 0;
                             this.availableTextures[i].texture = textureModel.GetTexture(variation);
                             this.availableTextures[i].sourceRect = GetSourceRectangle(textureModel, _textureTarget, textureModel.TextureWidth, textureModel.TextureHeight, variation);
-                            b.Draw(this.availableTextures[i].texture, new Vector2((float)this.availableTextures[i].bounds.X + (float)(this.availableTextures[i].sourceRect.Width / 2) * this.availableTextures[i].baseScale, (float)this.availableTextures[i].bounds.Y + (float)(this.availableTextures[i].sourceRect.Height / 2) * this.availableTextures[i].baseScale + offset), this.availableTextures[i].sourceRect, colorOverlay, 0f, new Vector2(this.availableTextures[i].sourceRect.Width / 2, this.availableTextures[i].sourceRect.Height / 2), this.availableTextures[i].scale, SpriteEffects.None, 0.87f);
+                            b.Draw(this.availableTextures[i].texture, new Vector2(this.availableTextures[i].bounds.X + this.availableTextures[i].sourceRect.Width / 2 * this.availableTextures[i].baseScale, this.availableTextures[i].bounds.Y + this.availableTextures[i].sourceRect.Height / 2 * this.availableTextures[i].baseScale + offset), this.availableTextures[i].sourceRect, colorOverlay, 0f, new Vector2(this.availableTextures[i].sourceRect.Width / 2, this.availableTextures[i].sourceRect.Height / 2), this.availableTextures[i].scale, SpriteEffects.None, 0.87f);
                         }
                         else if (_textureType is TextureType.Character && PatchTemplate.GetCharacterAt(Game1.currentLocation, (int)_position.X, (int)_position.Y) is Character character && character != null)
                         {

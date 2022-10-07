@@ -51,14 +51,14 @@ namespace AlternativeTextures.Framework.Patches.SpecialObjects
                 scaleFactor *= 4f;
                 Vector2 position = Game1.GlobalToLocal(Game1.viewport, new Vector2(x * 64, y * 64 - 64));
                 Rectangle destination = new Rectangle((int)(position.X - scaleFactor.X / 2f) + ((__instance.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(position.Y - scaleFactor.Y / 2f) + ((__instance.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(64f + scaleFactor.X), (int)(128f + scaleFactor.Y / 2f));
-                spriteBatch.Draw(textureModel.GetTexture(textureVariation), destination, new Rectangle((__instance.showNextIndex ? 1 : 0) * textureModel.TextureWidth, textureOffset, 16, 32), Color.White * alpha, 0f, Vector2.Zero, SpriteEffects.None, Math.Max(0f, (float)((y + 1) * 64 - 24) / 10000f) + (((int)__instance.parentSheetIndex == 105) ? 0.0035f : 0f) + (float)x * 1E-05f);
+                spriteBatch.Draw(textureModel.GetTexture(textureVariation), destination, new Rectangle((__instance.showNextIndex ? 1 : 0) * textureModel.TextureWidth, textureOffset, 16, 32), Color.White * alpha, 0f, Vector2.Zero, SpriteEffects.None, Math.Max(0f, ((y + 1) * 64 - 24) / 10000f) + (((int)__instance.parentSheetIndex == 105) ? 0.0035f : 0f) + x * 1E-05f);
 
                 if ((int)__instance.hoeDirt.Value.fertilizer != 0)
                 {
                     Rectangle fertilizer_rect = __instance.hoeDirt.Value.GetFertilizerSourceRect(__instance.hoeDirt.Value.fertilizer);
                     fertilizer_rect.Width = 13;
                     fertilizer_rect.Height = 13;
-                    spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(__instance.tileLocation.X * 64f + 4f, __instance.tileLocation.Y * 64f - 12f)), fertilizer_rect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, (__instance.tileLocation.Y + 0.65f) * 64f / 10000f + (float)x * 1E-05f);
+                    spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(__instance.tileLocation.X * 64f + 4f, __instance.tileLocation.Y * 64f - 12f)), fertilizer_rect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, (__instance.tileLocation.Y + 0.65f) * 64f / 10000f + x * 1E-05f);
                 }
                 if (__instance.hoeDirt.Value.crop != null)
                 {
@@ -66,7 +66,7 @@ namespace AlternativeTextures.Framework.Patches.SpecialObjects
                 }
                 if (__instance.heldObject.Value != null)
                 {
-                    __instance.heldObject.Value.draw(spriteBatch, x * 64, y * 64 - 48, (__instance.tileLocation.Y + 0.66f) * 64f / 10000f + (float)x * 1E-05f, 1f);
+                    __instance.heldObject.Value.draw(spriteBatch, x * 64, y * 64 - 48, (__instance.tileLocation.Y + 0.66f) * 64f / 10000f + x * 1E-05f, 1f);
                 }
                 if (__instance.bush.Value != null)
                 {

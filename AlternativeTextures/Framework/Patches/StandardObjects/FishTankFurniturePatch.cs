@@ -89,7 +89,7 @@ namespace AlternativeTextures.Framework.Patches.StandardObjects
                         {
                             TankFish fish = __instance.tankFish[i];
                             float fish_layer = Utility.Lerp(__instance.GetFishSortRegion().Y, __instance.GetFishSortRegion().X, fish.zPosition / 20f);
-                            fish_layer += 1E-07f * (float)i;
+                            fish_layer += 1E-07f * i;
                             fish.Draw(spriteBatch, alpha, fish_layer);
                             if (fish.fishIndex != 86)
                             {
@@ -118,13 +118,13 @@ namespace AlternativeTextures.Framework.Patches.StandardObjects
                                 Vector2 decoration_position = decoration.Value;
                                 Rectangle decoration_source_rect = decoration.Key;
                                 float decoration_layer = Utility.Lerp(__instance.GetFishSortRegion().Y, __instance.GetFishSortRegion().X, decoration_position.Y / 20f) - 1E-06f;
-                                spriteBatch.Draw(__instance.GetAquariumTexture(), Game1.GlobalToLocal(new Vector2((float)__instance.GetTankBounds().Left + decoration_position.X * 4f, (float)(__instance.GetTankBounds().Bottom - 4) - decoration_position.Y * 4f)), decoration_source_rect, Color.White * alpha, 0f, new Vector2(decoration_source_rect.Width / 2, decoration_source_rect.Height - 4), 4f, SpriteEffects.None, decoration_layer);
+                                spriteBatch.Draw(__instance.GetAquariumTexture(), Game1.GlobalToLocal(new Vector2(__instance.GetTankBounds().Left + decoration_position.X * 4f, __instance.GetTankBounds().Bottom - 4 - decoration_position.Y * 4f)), decoration_source_rect, Color.White * alpha, 0f, new Vector2(decoration_source_rect.Width / 2, decoration_source_rect.Height - 4), 4f, SpriteEffects.None, decoration_layer);
                             }
                         }
                         foreach (Vector4 bubble in __instance.bubbles)
                         {
                             float layer = Utility.Lerp(__instance.GetFishSortRegion().Y, __instance.GetFishSortRegion().X, bubble.Z / 20f) - 1E-06f;
-                            spriteBatch.Draw(__instance.GetAquariumTexture(), Game1.GlobalToLocal(new Vector2((float)__instance.GetTankBounds().Left + bubble.X, (float)(__instance.GetTankBounds().Bottom - 4) - bubble.Y - bubble.Z * 4f)), new Rectangle(0, 240, 16, 16), Color.White * alpha, 0f, new Vector2(8f, 8f), 4f * bubble.W, SpriteEffects.None, layer);
+                            spriteBatch.Draw(__instance.GetAquariumTexture(), Game1.GlobalToLocal(new Vector2(__instance.GetTankBounds().Left + bubble.X, __instance.GetTankBounds().Bottom - 4 - bubble.Y - bubble.Z * 4f)), new Rectangle(0, 240, 16, 16), Color.White * alpha, 0f, new Vector2(8f, 8f), 4f * bubble.W, SpriteEffects.None, layer);
                         }
                     }
                     FurniturePatch.DrawPrefix(__instance, ___sourceIndexOffset, ___drawPosition, spriteBatch, x, y, alpha);

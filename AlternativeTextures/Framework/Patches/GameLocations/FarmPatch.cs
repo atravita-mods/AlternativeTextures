@@ -51,7 +51,7 @@ namespace AlternativeTextures.Framework.Patches.GameLocations
                     if (__instance.paintedHouseTexture != null)
                     {
                         __instance.paintedHouseTexture.Dispose();
-                        __instance.paintedHouseTexture = BuildingPainter.Apply(Farm.houseTextures, "Buildings\\houses_PaintMask", __instance.housePaintColor);
+                        __instance.paintedHouseTexture = BuildingPainter.Apply(Farm.houseTextures, "Buildings\\houses_PaintMask", __instance.housePaintColor.Value);
                     }
                 }
 
@@ -143,9 +143,9 @@ namespace AlternativeTextures.Framework.Patches.GameLocations
                 {
                     float yOffset = 4f * (float)Math.Round(Math.Sin(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 250.0), 2);
                     Point mailbox_position = Game1.player.getMailboxPosition();
-                    float draw_layer = (float)((mailbox_position.X + 1) * 64) / 10000f + (float)(mailbox_position.Y * 64) / 10000f;
-                    b.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(mailbox_position.X * 64, (float)(mailbox_position.Y * 64 - 96 - 48) + yOffset)), new Microsoft.Xna.Framework.Rectangle(141, 465, 20, 24), Color.White * 0.75f, 0f, Vector2.Zero, 4f, SpriteEffects.None, draw_layer + 1E-06f);
-                    b.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(mailbox_position.X * 64 + 32 + 4, (float)(mailbox_position.Y * 64 - 64 - 24 - 8) + yOffset)), new Microsoft.Xna.Framework.Rectangle(189, 423, 15, 13), Color.White, 0f, new Vector2(7f, 6f), 4f, SpriteEffects.None, draw_layer + 1E-05f);
+                    float draw_layer = (mailbox_position.X + 1) * 64 / 10000f + mailbox_position.Y * 64 / 10000f;
+                    b.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(mailbox_position.X * 64, mailbox_position.Y * 64 - 96 - 48 + yOffset)), new Microsoft.Xna.Framework.Rectangle(141, 465, 20, 24), Color.White * 0.75f, 0f, Vector2.Zero, 4f, SpriteEffects.None, draw_layer + 1E-06f);
+                    b.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2(mailbox_position.X * 64 + 32 + 4, mailbox_position.Y * 64 - 64 - 24 - 8 + yOffset)), new Microsoft.Xna.Framework.Rectangle(189, 423, 15, 13), Color.White, 0f, new Vector2(7f, 6f), 4f, SpriteEffects.None, draw_layer + 1E-05f);
                 }
                 if (___shippingBinLid != null)
                 {

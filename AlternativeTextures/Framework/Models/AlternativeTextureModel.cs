@@ -106,9 +106,9 @@ namespace AlternativeTextures.Framework.Models
 
         public Texture2D GetTexture(int variation)
         {
-            if (Textures.ContainsKey(variation))
+            if (Textures.TryGetValue(variation, out var tex))
             {
-                return Textures[variation];
+                return tex;
             }
 
             return Textures[0];

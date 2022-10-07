@@ -1,5 +1,7 @@
 ﻿using AlternativeTextures;
 using AlternativeTextures.Framework.Models;
+using AlternativeTextures.Framework.Utilities.Extensions;
+
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -80,7 +82,7 @@ namespace AlternativeTextures.Framework.Patches.GameLocations
                         var instanceName = GetObjectName(obj);
                         if (obj is Fence fence && fence.isGate.Value)
                         {
-                            instanceName = Game1.objectInformation[325].Split('/')[0];
+                            instanceName = Game1.objectInformation[325].GetNthChunk('/', Object.objectInfoNameIndex).ToString();
                         }
 
                         var seasonalName = String.Concat(obj.modData["AlternativeTextureOwner"], ".", $"{AlternativeTextureModel.TextureType.Craftable}_{instanceName}_{season}");
@@ -93,7 +95,7 @@ namespace AlternativeTextures.Framework.Patches.GameLocations
                 }
             }
 
-            if (__instance.characters != null)
+            if (__instance.characters is not null)
             {
                 for (int k = __instance.characters.Count() - 1; k >= 0; k--)
                 {
@@ -152,7 +154,7 @@ namespace AlternativeTextures.Framework.Patches.GameLocations
                         __instance.modData["AlternativeTextureSeason"] = Game1.currentSeason;
                         __instance.modData["AlternativeTextureName"] = String.Concat(__instance.modData["AlternativeTextureName"], "_", __instance.modData["AlternativeTextureSeason"]);
 
-                        houseFarm.houseSource.Value = new Rectangle(0, 144 * (((int)Game1.MasterPlayer.houseUpgradeLevel == 3) ? 2 : ((int)Game1.MasterPlayer.houseUpgradeLevel)), 160, 144);
+                        houseFarm.houseSource.Value = new Rectangle(0, 144 * (((int)Game1.MasterPlayer.HouseUpgradeLevel == 3) ? 2 : ((int)Game1.MasterPlayer.HouseUpgradeLevel)), 160, 144);
                         houseFarm.ApplyHousePaint();
                     }
                 }

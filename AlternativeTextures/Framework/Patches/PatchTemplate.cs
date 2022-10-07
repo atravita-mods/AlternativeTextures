@@ -1,6 +1,8 @@
 ﻿using AlternativeTextures.Framework.Interfaces;
 using AlternativeTextures.Framework.Models;
 using AlternativeTextures.Framework.Patches.Entities;
+using AlternativeTextures.Framework.Utilities.Extensions;
+
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -72,7 +74,7 @@ namespace AlternativeTextures.Framework.Patches
         internal static string GetObjectName(Object obj)
         {
             // Perform separate check for DGA objects, before using check for vanilla objects
-            if (IsDGAUsed() && AlternativeTextures.apiManager.GetDynamicGameAssetsApi() is IDynamicGameAssetsApi api && api != null)
+            if (IsDGAUsed() && AlternativeTextures.apiManager.GetDynamicGameAssetsApi() is IDynamicGameAssetsApi api)
             {
                 var dgaId = api.GetDGAItemId(obj);
                 if (dgaId != null)
@@ -81,37 +83,34 @@ namespace AlternativeTextures.Framework.Patches
                 }
             }
 
-            if (obj.bigCraftable)
+            if (obj.bigCraftable.Value)
             {
-                if (!Game1.bigCraftablesInformation.ContainsKey(obj.parentSheetIndex))
+                if (Game1.bigCraftablesInformation.TryGetValue(obj.ParentSheetIndex, out var data))
                 {
-                    return obj.name;
+                    return data.GetNthChunk('/', Object.objectInfoNameIndex).ToString();
                 }
-
-                return Game1.bigCraftablesInformation[obj.parentSheetIndex].Split('/')[0];
+                return obj.name;
             }
             else if (obj is Furniture)
             {
                 var dataSheet = Game1.content.LoadBase<Dictionary<int, string>>("Data\\Furniture");
-                if (!dataSheet.ContainsKey(obj.parentSheetIndex))
+                if (dataSheet.TryGetValue(obj.ParentSheetIndex, out var data))
                 {
-                    return obj.name;
+                    return data.GetNthChunk('/', Object.objectInfoNameIndex).ToString();
                 }
-
-                return dataSheet[obj.parentSheetIndex].Split('/')[0];
+                return obj.name;
             }
             else
             {
-                if (obj is Fence fence && fence.isGate)
+                if (obj is Fence fence && fence.isGate.Value)
                 {
-                    return Game1.objectInformation[325].Split('/')[0];
+                    return 325.GetObjectNameFromID();
                 }
-                if (!Game1.objectInformation.ContainsKey(obj.parentSheetIndex))
+                if (Game1.objectInformation.TryGetValue(obj.ParentSheetIndex, out var data))
                 {
-                    return obj.name;
+                    return data.GetNthChunk('/', Object.objectInfoNameIndex).ToString();
                 }
-
-                return Game1.objectInformation[obj.parentSheetIndex].Split('/')[0];
+                return obj.name;
             }
         }
 
@@ -121,19 +120,19 @@ namespace AlternativeTextures.Framework.Patches
             {
                 if (child.Age >= 3)
                 {
-                    return $"{CharacterPatch.TODDLER_NAME_PREFIX}_{(child.Gender == 0 ? "Male" : "Female")}_{(child.darkSkinned ? "Dark" : "Light")}";
+                    return $"{CharacterPatch.TODDLER_NAME_PREFIX}_{(child.Gender == 0 ? "Male" : "Female")}_{(child.darkSkinned.Value ? "Dark" : "Light")}";
                 }
-                return $"{CharacterPatch.BABY_NAME_PREFIX}_{(child.darkSkinned ? "Dark" : "Light")}";
+                return $"{CharacterPatch.BABY_NAME_PREFIX}_{(child.darkSkinned.Value ? "Dark" : "Light")}";
             }
 
             if (character is FarmAnimal animal)
             {
                 var animalName = animal.type.Value;
-                if (animal.age < animal.ageWhenMature)
+                if (animal.age.Value < animal.ageWhenMature.Value)
                 {
                     animalName = "Baby" + (animal.type.Value.Equals("Duck") ? "White Chicken" : animal.type.Value);
                 }
-                else if (animal.showDifferentTextureWhenReadyForHarvest && animal.currentProduce <= 0)
+                else if (animal.showDifferentTextureWhenReadyForHarvest.Value && animal.currentProduce.Value <= 0)
                 {
                     animalName = "Sheared" + animalName;
                 }
@@ -156,7 +155,7 @@ namespace AlternativeTextures.Framework.Patches
                 return pet is Cat ? "Cat" : "Dog";
             }
 
-            return character.name;
+            return character.Name;
         }
 
         internal static string GetBuildingName(Building building)
@@ -167,7 +166,7 @@ namespace AlternativeTextures.Framework.Patches
                 return "Tractor Garage";
             }
 
-            return building.buildingType;
+            return building.buildingType.Value;
         }
 
         internal static Object GetObjectAt(GameLocation location, int x, int y)
@@ -182,7 +181,7 @@ namespace AlternativeTextures.Framework.Patches
             }
 
             // Prioritize checking non-rug furniture first
-            foreach (var furniture in location.furniture.Where(c => c.furniture_type != Furniture.rug))
+            foreach (var furniture in location.furniture.Where(c => c.furniture_type.Value != Furniture.rug))
             {
                 if (furniture.boundingBox.Value.Contains(x, y))
                 {
@@ -193,9 +192,9 @@ namespace AlternativeTextures.Framework.Patches
             // Replicating GameLocation.getObjectAt, but doing objects before rugs
             // Doing this so the object on top of rugs are given instead of the latter
             var tile = new Vector2(x / 64, y / 64);
-            if (location.objects.ContainsKey(tile))
+            if (location.objects.TryGetValue(tile, out var @object))
             {
-                return location.objects[tile];
+                return @object;
             }
 
             return location.getObjectAt(x, y);
@@ -215,12 +214,11 @@ namespace AlternativeTextures.Framework.Patches
         internal static TerrainFeature GetTerrainFeatureAt(GameLocation location, int x, int y)
         {
             Vector2 tile = new Vector2(x / 64, y / 64);
-            if (!location.terrainFeatures.ContainsKey(tile))
+            if (location.terrainFeatures.TryGetValue(tile, out var feature))
             {
-                return null;
+                return feature;
             }
-
-            return location.terrainFeatures[tile];
+            return null;
         }
 
         internal static Character GetCharacterAt(GameLocation location, int x, int y)
@@ -266,8 +264,9 @@ namespace AlternativeTextures.Framework.Patches
 
         internal static int GetFloorSheetId(Flooring floor)
         {
-            var matchedFloor = Game1.objectInformation.Where(p => p.Value.Split('/')[0] == GetFlooringName(floor));
-            return matchedFloor.Count() == 0 ? -1 : matchedFloor.First().Key;
+            string floorName = GetFlooringName(floor);
+            var matchedFloor = Game1.objectInformation.Where(p => p.Value.GetNthChunk('/', Object.objectInfoNameIndex).Equals(floorName, StringComparison.Ordinal)).FirstOrDefault();
+            return (matchedFloor.Value is null) ? -1 : matchedFloor.Key; // default KVP<int,string> is (0, null).
         }
 
         internal static string GetFlooringName(Flooring floor)
@@ -330,7 +329,7 @@ namespace AlternativeTextures.Framework.Patches
 
         internal static string GetBushTypeString(Bush bush)
         {
-            switch (bush.size)
+            switch (bush.size.Value)
             {
                 case 3:
                     return "Tea";
@@ -343,25 +342,25 @@ namespace AlternativeTextures.Framework.Patches
         {
             switch (obj)
             {
-                case Character character:
+                case Character:
                     return TextureType.Character;
-                case Flooring floor:
+                case Flooring:
                     return TextureType.Flooring;
-                case Tree tree:
+                case Tree:
                     return TextureType.Tree;
-                case FruitTree fruitTree:
+                case FruitTree:
                     return TextureType.FruitTree;
-                case Grass grass:
+                case Grass:
                     return TextureType.Grass;
-                case TerrainFeature hoeDirt:
+                case TerrainFeature:
                     return TextureType.Crop;
-                case Building building:
+                case Building:
                     return TextureType.Building;
-                case Furniture furniture:
+                case Furniture:
                     return TextureType.Furniture;
-                case Object craftable:
+                case Object:
                     return TextureType.Craftable;
-                case DecoratableLocation location:
+                case DecoratableLocation:
                     return TextureType.Decoration;
                 default:
                     return TextureType.Unknown;
@@ -396,7 +395,7 @@ namespace AlternativeTextures.Framework.Patches
 
         internal static bool IsDGAObject(object obj)
         {
-            if (IsDGAUsed() && AlternativeTextures.apiManager.GetDynamicGameAssetsApi() is IDynamicGameAssetsApi api && api != null)
+            if (IsDGAUsed() && AlternativeTextures.apiManager.GetDynamicGameAssetsApi() is IDynamicGameAssetsApi api)
             {
                 var dgaId = api.GetDGAItemId(obj);
                 if (dgaId != null)

@@ -27,7 +27,6 @@ namespace AlternativeTextures.Framework.Patches.Buildings
 
         internal BuildingPatch(IMonitor modMonitor, IModHelper modHelper) : base(modMonitor, modHelper)
         {
-
         }
 
         internal void Apply(Harmony harmony)
@@ -84,13 +83,13 @@ namespace AlternativeTextures.Framework.Patches.Buildings
                 case Barn barn:
                     //building.drawShadow(b, x, y);
                     b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, building.animalDoor.Y + 3) * 16f * scale, new Rectangle(64, 112, 32, 16), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.888f);
-                    b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, (float)building.animalDoor.Y + 2.25f) * 16f * scale, new Rectangle(0, 112, 32, 16), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, (float)(((int)building.tileY + (int)building.tilesHigh - 1) * 64) / 10000f - 1E-07f);
+                    b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, building.animalDoor.Y + 2.25f) * 16f * scale, new Rectangle(0, 112, 32, 16), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, ((int)building.tileY + (int)building.tilesHigh - 1) * 64 / 10000f - 1E-07f);
                     b.Draw(texture, new Vector2(x, y), new Rectangle(0, 0, 112, 112), building.color, 0f, new Vector2(0f, 0f), scale, SpriteEffects.None, 0.89f);
                     return;
                 case Coop coop:
                     //building.drawShadow(b, x, y);
                     b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, building.animalDoor.Y + 4) * 16f * scale, new Rectangle(16, 112, 16, 16), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1E-06f);
-                    b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, (float)building.animalDoor.Y + 3.5f) * 16f * scale, new Rectangle(0, 112, 16, 15), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, (float)(((int)building.tileY + (int)building.tilesHigh) * 64) / 10000f - 1E-07f);
+                    b.Draw(texture, new Vector2(x, y) + new Vector2(building.animalDoor.X, building.animalDoor.Y + 3.5f) * 16f * scale, new Rectangle(0, 112, 16, 15), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, ((int)building.tileY + (int)building.tilesHigh) * 64 / 10000f - 1E-07f);
                     b.Draw(texture, new Vector2(x, y), new Rectangle(0, 0, 96, 112), building.color, 0f, new Vector2(0f, 0f), scale, SpriteEffects.None, 0.89f);
                     return;
                 case FishPond fishPond:
@@ -261,9 +260,9 @@ namespace AlternativeTextures.Framework.Patches.Buildings
             {
                 Color color = pixels[index];
                 Utility.RGBtoHSL(color.R, color.G, color.B, out var h, out var s, out var i);
-                h += (double)h_shift;
-                s += (double)s_shift / 100.0;
-                i += (double)l_shift / 100.0;
+                h += h_shift;
+                s += s_shift / 100.0;
+                i += l_shift / 100.0;
                 while (h > 360.0)
                 {
                     h -= 360.0;

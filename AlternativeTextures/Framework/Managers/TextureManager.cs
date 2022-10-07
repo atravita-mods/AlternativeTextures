@@ -157,12 +157,7 @@ namespace AlternativeTextures.Framework.Managers
 
         public Texture2D GetTextureByToken(string token)
         {
-            if (String.IsNullOrEmpty(token) || _tokenToTextures.ContainsKey(token) is false)
-            {
-                return null;
-            }
-
-            return _tokenToTextures[token];
+            return (!string.IsNullOrEmpty(token) && _tokenToTextures.TryGetValue(token, out var tex)) ? tex : null;
         }
 
         public TokenModel GetModelByToken(string token)
